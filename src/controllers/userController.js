@@ -3,11 +3,15 @@ const jwt = require('jsonwebtoken');
 const authConfig = require('../config/auth.json');
 const bcrypt = require('bcryptjs');
 
+var blackList = [];
+
 function generateToken(params = {}) {
     return jwt.sign(params, authConfig.secret, { expiresIn: 86400 });
 }
 
 module.exports = {
+    blackList,
+
     async create(req, res) {
         const { email } = req.body;
 
@@ -51,6 +55,10 @@ module.exports = {
     },
 
     async logout(req, res) {
-        res.send();
+        const token = req.headers.authorization;
+
+        blackList.push(token);
+
+        return res.send();
     }
 }

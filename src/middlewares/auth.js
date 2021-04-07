@@ -2,12 +2,20 @@ const jwt = require('jsonwebtoken');
 const authConfig = require('../config/auth.json');
 const userController = require('../controllers/userController');
 
+const blackList = userController.blackList;
+
 
 module.exports = (req, res, next) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
         return res.status(401).send({ error: 'Não forneceu o token.' });
+    }
+
+    for (var i=0; i<blackList.length; i++) {
+        if (authHeader === blackList[i]) {
+            return res.status(401).send({ error: 'Token vencido.' });
+        }
     }
 
     const parts = authHeader.split(' ');
