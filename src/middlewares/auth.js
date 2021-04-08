@@ -11,7 +11,7 @@ module.exports = (req, res, next) => {
     if (!authHeader) {
         return res.status(401).send({ error: 'Não forneceu o token.' });
     }
-
+    // da pra substituir por blackList.include(authHeader)
     for (var i=0; i<blackList.length; i++) {
         if (authHeader === blackList[i]) {
             return res.status(401).send({ error: 'Token vencido.' });
