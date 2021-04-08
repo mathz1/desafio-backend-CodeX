@@ -11,7 +11,6 @@ const TaskSchema = new mongoose.Schema({
         default: 'BAIXA',
         require: true
     },
-    // Fica?
     assignedTo: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
