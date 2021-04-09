@@ -19,7 +19,7 @@ module.exports = {
 
             for (let taskId of user.tasks) {
                 let task = await Task.findById(taskId).exec();
-                result.push(task._id)
+                result.push(task)
             }
     
             return res.send({ result })
@@ -98,6 +98,23 @@ module.exports = {
             return res.send({ task })
         } catch (error) {
             return res.status(400).send( { error: 'Error ao deletar tarefa' } )
+        }
+    },
+    // Order the list of tasks
+    async orderListTask(req, res) {
+        try {
+            let user = await User.findById(req.userId).exec();
+            let tasks = []
+
+            for (let taskId of user.tasks) {
+                let task = await Task.findById(taskId).exec();
+                tasks.push(task)
+            }
+            tasks.sort((a,b) => a.priority.localeCompare(b.priority));
+    
+            return res.send({ tasks })
+        } catch (err) {
+            return res.status(400).send( { error: 'Error ao ordenar as tarefas. ' + err } )
         }
     }
 }
