@@ -7,12 +7,12 @@ const { blackList } = require('../controllers/userController');
 module.exports = (req, res, next) => {
     const authHeader = req.headers.authorization;
 
-    if (blackList.includes(authHeader)) {
-        return res.status(401).send({ error: 'Token vencido.' });
-    }
-
     if (!authHeader) {
         return res.status(401).send({ error: 'Não forneceu o token.' });
+    }
+
+    if (blackList.includes(authHeader)) {
+        return res.status(401).send({ error: 'Token vencido.' });
     }
 
     const parts = authHeader.split(' ');
