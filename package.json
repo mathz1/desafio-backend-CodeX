@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon ./src/server.js",
+    "start": "./src/server.js",
+    "start_dev": "nodemon ./src/server.js",
     "test": "cross-env NODE_ENV=test jest --runInBand --env=node"
   },
   "keywords": [],
