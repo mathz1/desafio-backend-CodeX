@@ -1,8 +1,7 @@
 const jwt = require('jsonwebtoken');
-const authConfig = require('../config/auth.json');
-const userController = require('../controllers/userController');
-
-const blackList = userController.blackList;
+require('dotenv/config');
+const User = require('../models/User');
+const { blackList } = require('../controllers/userController');
 
 
 module.exports = (req, res, next) => {
@@ -12,10 +11,8 @@ module.exports = (req, res, next) => {
         return res.status(401).send({ error: 'Não forneceu o token.' });
     }
 
-    for (var i=0; i<blackList.length; i++) {
-        if (authHeader === blackList[i]) {
-            return res.status(401).send({ error: 'Token vencido.' });
-        }
+    if (blackList.includes(authHeader)) {
+        return res.status(401).send({ error: 'Token vencido.' });
     }
 
     const parts = authHeader.split(' ');
@@ -26,9 +23,15 @@ module.exports = (req, res, next) => {
         return res.status(401).send({ error: 'Token mal formado.' });
     }
 
-    jwt.verify(token, authConfig.secret, (err, decoded) => {
+    jwt.verify(token, process.env.SECRET, async (err, decoded) => {
         if (err) {
             return res.status(401).send({ error: 'Token inválido.' });
+        }
+
+        const user = await User.findOne({ _id: decoded.id });
+
+        if (!user) {
+            return res.status(400).send({ error: 'Usuário não existe.' });
         }
 
         req.userId = decoded.id;

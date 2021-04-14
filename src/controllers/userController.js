@@ -1,12 +1,12 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
-const authConfig = require('../config/auth.json');
+require('dotenv/config')
 const bcrypt = require('bcryptjs');
 
 var blackList = [];
 
 function generateToken(params = {}) {
-    return jwt.sign(params, authConfig.secret, { expiresIn: 86400 });
+    return jwt.sign(params, process.env.SECRET, { expiresIn: 86400 });
 }
 
 module.exports = {
@@ -48,10 +48,10 @@ module.exports = {
 
         user.password = undefined;
 
-        res.send({
-           user,
-           token: generateToken({ id: user.id }) 
-        });
+        return res.send({
+            user,
+            token: generateToken({ id: user.id }) 
+         });
     },
 
     async logout(req, res) {
