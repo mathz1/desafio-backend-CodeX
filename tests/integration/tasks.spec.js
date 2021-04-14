@@ -52,6 +52,13 @@ describe('Tasks', () => {
             completed: true
         }).set('authorization', token);
 
+        //Tarefa não cadastrada pra esse usuario
+        const response_task_update_error = await request(app).put('/tasks/6070826a41173f210a754eee').send({
+            name: "Test Task 1 Update",
+            completed: true
+        }).set('authorization', token);
+
+        expect(response_task_update_error.body.error).toBe('Tarefa não cadastrada');
         expect(response_task_update.body.task.name).toBe('Test Task 1 Update');
         expect(response_task_update.body.task.completed).toBe(true);
     });
@@ -60,7 +67,7 @@ describe('Tasks', () => {
         const response_task_list = await request(app).get('/tasks/' + idTaskTest).set('authorization', token);
 
         //Tarefa não cadastrada pra esse usuario
-        const response_task_list_error = await request(app).get('/tasks/123456').set('authorization', token);
+        const response_task_list_error = await request(app).get('/tasks/6070826a41173f210a754eee').set('authorization', token);
 
         expect(response_task_list_error.body.error).toBe('Tarefa não cadastrada');
         expect(response_task_list.body.task.name).toBe('Test Task 1 Update');
@@ -70,7 +77,7 @@ describe('Tasks', () => {
         const response_task_delete = await request(app).delete('/tasks/' + idTaskTest).set('authorization', token);
 
         //Tarefa não cadastrada pra esse usuario
-        const response_task_delete_error = await request(app).delete('/tasks/123456').set('authorization', token);
+        const response_task_delete_error = await request(app).delete('/tasks/6070826a41173f210a754eee').set('authorization', token);
 
         expect(response_task_delete_error.body.error).toBe('Tarefa não cadastrada');
         expect(response_task_delete.body.task.name).toBe('Test Task 1 Update');

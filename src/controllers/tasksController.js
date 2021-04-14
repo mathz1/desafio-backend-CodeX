@@ -30,17 +30,15 @@ module.exports = {
     // List the specific task 
     async listTaskId(req, res) {
         try {
-            await User.findById(req.userId, function (err, user) {
-                if (err) return err;
-    
-                if (!user.tasks.includes(req.params.taskId)) return res.status(400).send( { error: 'Tarefa não cadastrada' } );
-            });
+            const user = await User.findById(req.userId);
+
+            if (!user.tasks.includes(req.params.taskId)) return res.status(400).send( { error: 'Tarefa não cadastrada' } );
     
             let task = await Task.findById(req.params.taskId);
     
             return res.send({ task });
         } catch (err) {
-            //return res.status(400).send( { error: 'Error ao listar a tarefa. ' + err } );
+            return res.status(400).send( { error: 'Error ao listar a tarefa. ' + err } );
         }
     },
     // Create a new task
@@ -51,12 +49,10 @@ module.exports = {
             if (!name) return res.status(400).send({ error: 'Falha no registro: Nome da tarefa invalido' });
             let task = await Task.create({ name, priority, completed, assignedTo: req.userId} );            
 
-            await User.findById(req.userId, function (err, user) {
-                if (err) return err;
-                
-                user.tasks.push(task._id);
-                user.save();
-            }).select('+password');
+            const user = await User.findById(req.userId).select('+password');
+
+            user.tasks.push(task._id);
+            user.save();
     
             return res.send({ task });
         } catch (err) {
@@ -66,11 +62,11 @@ module.exports = {
     // Update the task
     async updateTask(req, res) {
         try {
-            await User.findById(req.userId, function (err, user) {
-                if (err) return err;
-    
-                if (!user.tasks.includes(req.params.taskId)) return res.status(400).send( { error: 'Tarefa não cadastrada' } );
-            })
+            const user = await User.findById(req.userId);
+
+            if (!user.tasks.includes(req.params.taskId)) {
+                return res.status(400).send( { error: 'Tarefa não cadastrada' } );
+            }
     
             let task = await Task.findByIdAndUpdate(req.params.taskId, req.body, { new: true });
     
@@ -84,20 +80,20 @@ module.exports = {
     // Delete task from DB
     async deleteTask(req, res) {
         try {
-            await User.findById(req.userId, function (err, user) {
-                if (err) return err;
+            const user = await User.findById(req.userId).select('+password');
+
+            if (!user.tasks.includes(req.params.taskId)) {
+                return res.status(400).send( { error: 'Tarefa não cadastrada' } );
+            }
     
-                if (!user.tasks.includes(req.params.taskId)) return res.status(400).send( { error: 'Tarefa não cadastrada' } );
-    
-                user.tasks.splice(user.tasks.indexOf(req.params.taskId),1);
-                user.save();
-            }).select('+password');
+            user.tasks.splice(user.tasks.indexOf(req.params.taskId),1);
+            user.save();
     
             let task = await Task.findByIdAndDelete(req.params.taskId);
     
             return res.send({ task });
         } catch (err) {
-            //return res.status(400).send( { error: 'Error ao deletar tarefa' } );
+            return res.status(400).send( { error: 'Error ao deletar tarefa' } );
         }
     },
     // Order the list of tasks
