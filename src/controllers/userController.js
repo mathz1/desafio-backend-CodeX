@@ -34,6 +34,7 @@ module.exports = {
     },
 
     async login(req, res) {
+        try {
         const { email, password } = req.body;
 
         const user = await User.findOne({ email }).select('+password');
@@ -52,6 +53,10 @@ module.exports = {
             user,
             token: generateToken({ id: user.id }) 
          });
+        } catch (err) {
+            return res.status(400).send( { error: 'Falha ao realizar o login: ' + err } )
+        }
+        
     },
 
     async logout(req, res) {
