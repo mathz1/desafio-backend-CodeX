@@ -29,7 +29,7 @@ module.exports = {
                 token: generateToken({ id: user.id })
             });
         } catch (err) {
-            return res.status(400).send({ error: 'Falha no registro.' })
+            return res.status(400).send({ error: 'Falha no registro. ' + err })
         }
     },
 
