@@ -20,7 +20,10 @@ module.exports = {
                 return res.status(400).send({ error: 'Usuário já existe.' });
             }
 
-            const user = await User.create(req.body);
+            const hash = await bcrypt.hash(req.body.password, 10);
+            const password = hash;
+
+            const user = await User.create({ ...req.body, password: password });
 
             user.password = undefined;
 
