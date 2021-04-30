@@ -20,7 +20,10 @@ module.exports = {
                 return res.status(400).send({ error: 'Usuário já existe.' });
             }
 
-            const user = await User.create(req.body);
+            const hash = await bcrypt.hash(req.body.password, 10);
+            const password = hash;
+
+            const user = await User.create({ ...req.body, password: password });
 
             user.password = undefined;
 
@@ -29,11 +32,12 @@ module.exports = {
                 token: generateToken({ id: user.id })
             });
         } catch (err) {
-            return res.status(400).send({ error: 'Falha no registro.' })
+            return res.status(400).send({ error: 'Falha no registro. ' + err })
         }
     },
 
     async login(req, res) {
+        try {
         const { email, password } = req.body;
 
         const user = await User.findOne({ email }).select('+password');
@@ -52,6 +56,10 @@ module.exports = {
             user,
             token: generateToken({ id: user.id }) 
          });
+        } catch (err) {
+            return res.status(400).send( { error: 'Falha ao realizar o login: ' + err } )
+        }
+        
     },
 
     async logout(req, res) {
